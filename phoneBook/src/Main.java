@@ -1,41 +1,76 @@
+import javax.lang.model.type.ArrayType;
 import java.io.*;
+import java.util.*;
 
 // FileText 클래스는 파일을 읽고 쓰는 기능을 제공하는 클래스
 public class Main {
 
-    // read 메서드는 지정된 경로와 파일 이름을 사용하여 파일을 읽고, 그 내용을 문자열로 반환
-    public String read(String path, String fileName) {
-        File file = new File(path, fileName);  // 파일 객체 생성
-        BufferedReader br;  // BufferedReader 객체 선언
-        String retStr = "";  // 반환할 문자열 초기화
+    private static ArrayList<Info> infoBook = new ArrayList<>();
 
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
         try {
-            br = new BufferedReader(new FileReader(file));  // BufferedReader 객체 생성
-            String line;
-            // 파일의 각 라인을 읽어와서 retStr에 추가
-            while ((line = br.readLine()) != null) {
-                System.out.println("line: " + line);
-                retStr += line + "\n";
+            while(true) {
+                System.out.println("1. 저장하기");
+                System.out.println("2. 목록 출력하기");
+                System.out.println("3. 이름으로 검색하기");
+                System.out.println("4. 프로그램 종료하기");
+                System.out.println("5. 목록 내보내기\n");
+                System.out.print("번호 입력 : ");
+                int n = scan.nextInt();
+
+                if (n == 1) {
+                    System.out.print("이름 입력 : ");
+                    String num = scan.next();
+                    System.out.print("전화번호 입력 : ");
+                    String phone = scan.next();
+                    System.out.println();
+                    infoBook.add(new Info(num, phone));
+                }
+
+                else if (n == 2) {
+                    System.out.println("현재 등록된 데이터 개수 : " + infoBook.size() + "개");
+                    infoBook.sort(new UserComparator());
+                    for (Info info : infoBook) {
+                        System.out.println("[ " + info.getUsername() + " - " + info.getPhone() + " ]");
+                    }
+                    System.out.println();
+                }
+
+                else if (n == 3) {
+                    System.out.print("검색할 이름 : ");
+                    String name = scan.next();
+                    ArrayList<String> array = new ArrayList<>();
+                    for (Info info : infoBook) {
+                        if (info.getUsername().contains(name)) {
+                            array.add("[ " + info.getUsername() + " - " + info.getPhone() + " ]");
+                        }
+                    }
+                    System.out.println("검색 결과 개수 : " + array.size());
+                    for (String str : array) {
+                        System.out.println(str);
+                    }
+                    System.out.println();
+                }
+
+                else if (n == 4) {
+                    System.out.println("프로그램을 종료합니다...");
+                    break;
+                }
+
+                else if (n == 5) {
+                    ArrayList<String> array = new ArrayList<>();
+                    for (Info info : infoBook) {
+                        array.add("[ " + info.getUsername() + " - " + info.getPhone() + " ]\n");
+                    }
+                    FileText.write(array);
+                }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();  // 파일을 찾지 못한 경우 예외 처리
-        } catch (IOException e) {
-            e.printStackTrace();  // 입출력 예외 처리
+        }
+        catch (Exception e) {
+            System.out.println("에러 발생");
+            System.exit(1);
         }
 
-        return retStr;  // 파일의 내용을 문자열로 반환
-    }
-
-    // write 메서드는 지정된 경로와 파일 이름을 사용하여 파일에 내용을 씀
-    public void write(String path, String fileName, String content, String username, String phone) {
-        File file = new File(path, fileName);  // 파일 객체 생성
-
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));  // BufferedWriter 객체 생성
-            writer.write(content);  // 파일에 내용 쓰기
-            writer.close();  // BufferedWriter 닫기
-        } catch (IOException e) {
-            e.printStackTrace();  // 입출력 예외 처리
-        }
     }
 }
